@@ -13,4 +13,16 @@ public class DepartmentService {
 	public List<Department> findAll() {
 		return dao.findAll();
 	}
+	
+	public void saveOrUpdate(Department obj) {
+		// testando se id é igual a null
+		// se for é pq o obj é novo e precisa ser inserido
+		if (obj.getId() == null) {
+			dao.insert(obj);
+		}
+		// caso contrario vai fazer um up date 
+		else {
+			dao.update(obj);
+		}
+	}
 }
