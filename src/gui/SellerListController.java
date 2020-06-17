@@ -1,5 +1,6 @@
 package gui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -24,6 +27,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Seller;
 import model.services.SellerService;
@@ -67,7 +72,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 	public void onBtNewAction(ActionEvent event) {
 		Stage parentStage = Utils.currentStage(event);
 		Seller obj = new Seller();
-		//createDialogForm(obj, "/gui/SellerForm.fxml", parentStage);
+		createDialogForm(obj, "/gui/SellerForm.fxml", parentStage);
 	}
 
 	public void setSellerService(SellerService service) {
@@ -115,39 +120,39 @@ public class SellerListController implements Initializable, DataChangeListener {
 		initRemoveButtons();
 	}
 
-//	private void createDialogForm(Seller obj, String absoluteName, Stage parentStage) {
-//		try {
-//			// Instanciando FXMLLoader para poder abrir nova tela
-//			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-//			// carregando o pane
-//			Pane pane = loader.load();
-//
-//			// pegou o controller da tela que foi carregada acima
-//			SellerFormController controller = loader.getController();
-//			// setando o comtrolador
-//			controller.setSeller(obj);
-//			// setando o SellerService
-//			controller.setSellerService(new SellerService());
-//			// evento que faz a atualização da lista quando adcionado um novo departamento
-//			controller.subscribeDataChangeListener(this);
-//			// carregar o obj no formulario
-//			controller.upDateFormData();
-//
-//			Stage dialogStage = new Stage();
-//			dialogStage.setTitle("Enter Seller data");
-//			dialogStage.setScene(new Scene(pane));
-//			// não pode ser rederizada
-//			dialogStage.setResizable(false);
-//			// chamando o palco
-//			dialogStage.initOwner(parentStage);
-//			// só pode fazer outra coisa se for fechada
-//			dialogStage.initModality(Modality.WINDOW_MODAL);
-//			dialogStage.showAndWait();
-//
-//		} catch (IOException e) {
-//			Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
-//		}
-//	}
+	private void createDialogForm(Seller obj, String absoluteName, Stage parentStage) {
+		try {
+			// Instanciando FXMLLoader para poder abrir nova tela
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			// carregando o pane
+			Pane pane = loader.load();
+
+			// pegou o controller da tela que foi carregada acima
+			SellerFormController controller = loader.getController();
+			// setando o comtrolador
+			controller.setSeller(obj);
+			// setando o SellerService
+			controller.setSellerService(new SellerService());
+			// evento que faz a atualização da lista quando adcionado um novo departamento
+			controller.subscribeDataChangeListener(this);
+			// carregar o obj no formulario
+			controller.upDateFormData();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Enter Seller data");
+			dialogStage.setScene(new Scene(pane));
+			// não pode ser rederizada
+			dialogStage.setResizable(false);
+			// chamando o palco
+			dialogStage.initOwner(parentStage);
+			// só pode fazer outra coisa se for fechada
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.showAndWait();
+
+		} catch (IOException e) {
+			Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
+		}
+	}
 
 	@Override
 	public void onDataChanged() {
@@ -169,8 +174,8 @@ public class SellerListController implements Initializable, DataChangeListener {
 					return;
 				}
 				setGraphic(button);
-//				button.setOnAction(
-//						event -> createDialogForm(obj, "/gui/SellerForm.fxml", Utils.currentStage(event)));
+				button.setOnAction(
+				event -> createDialogForm(obj, "/gui/SellerForm.fxml", Utils.currentStage(event)));
 			}
 		});
 	}
