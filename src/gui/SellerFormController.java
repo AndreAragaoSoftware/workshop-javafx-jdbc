@@ -1,8 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -17,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Seller;
@@ -29,8 +33,8 @@ public class SellerFormController implements Initializable {
 	private Seller entity;
 
 	private SellerService service;
-	
-	//intanciando lista de atualização do departamento
+
+	// intanciando lista de atualização do departamento
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 
 	@FXML
@@ -38,7 +42,20 @@ public class SellerFormController implements Initializable {
 	@FXML
 	private TextField txtName;
 	@FXML
+	private TextField txtEmail;
+	// O DatePicker foi criado no Utils.java
+	@FXML
+	private DatePicker dpBirthDate;
+	@FXML
+	private TextField txtBaseSalary;
+	@FXML
 	private Label labelErrorName;
+	@FXML
+	private Label labelErrorEmail;
+	@FXML
+	private Label labelErrorBirthDate;
+	@FXML
+	private Label labelErrorBaseSalary;
 	@FXML
 	private Button btSave;
 	@FXML
@@ -51,7 +68,8 @@ public class SellerFormController implements Initializable {
 	public void setSellerService(SellerService service) {
 		this.service = service;
 	}
-	//sobrecrever a lista
+
+	// sobrecrever a lista
 	public void subscribeDataChangeListener(DataChangeListener listener) {
 		dataChangeListeners.add(listener);
 	}
@@ -72,42 +90,43 @@ public class SellerFormController implements Initializable {
 			notifyDataChangeListeners();
 			// Fechar a janela
 			Utils.currentStage(event).close();
-			
+
 		} catch (DbException e) {
 			Alerts.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
-		}catch(ValidationException e) {
+		} catch (ValidationException e) {
 			setErrorMessages(e.getErrors());
 		}
 
 	}
+
 	// metodo para atulizar a lista de departamento
 	private void notifyDataChangeListeners() {
 		for (DataChangeListener listener : dataChangeListeners) {
 			listener.onDataChanged();
 		}
-		
+
 	}
 
 	private Seller getFormData() {
 		// instanciando o obj no Seller
 		Seller obj = new Seller();
-		
-		//instanciando a exception
+
+		// instanciando a exception
 		ValidationException exception = new ValidationException("Validation error");
 
 		// pegando o texto da caixa txtId
 		// foi utilizado o metodo tryParse para tranformar em int
 		obj.setId(Utils.tryParseToInt(txtId.getText()));
-		
+
 		// o .trim() serve para eliminar os espaços em branco
-		if(txtName.getText() == null || txtName.getText().trim().equals("")) {
-			//foi add um erro caso o campo estiver vazio
+		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
+			// foi add um erro caso o campo estiver vazio
 			exception.addError("name", "Fiel can't be empty");
 		}
 		obj.setName(txtName.getText());
-		
-		//testando pra ve se existe pelomenos um erro 
-		if(exception.getErrors().size() > 0) {
+
+		// testando pra ve se existe pelomenos um erro
+		if (exception.getErrors().size() > 0) {
 			throw exception;
 		}
 
@@ -130,7 +149,10 @@ public class SellerFormController implements Initializable {
 		// o txtId só aceita numero Inteiro
 		Constraints.setTextFieldInteger(txtId);
 		// o txtName só pode ter no maximo 30 caracters
-		Constraints.setTextFieldMaxLength(txtName, 30);
+		Constraints.setTextFieldMaxLength(txtName, 70);
+		Constraints.setTextFieldDouble(txtBaseSalary);
+		Constraints.setTextFieldMaxLength(txtEmail, 60);
+		Utils.formatDatePicker(dpBirthDate, "dd/MM/yyyy");
 	}
 
 	public void upDateFormData() {
@@ -140,13 +162,20 @@ public class SellerFormController implements Initializable {
 		// valueOf foi pra converter o id para String
 		txtId.setText(String.valueOf(entity.getId()));
 		txtName.setText(entity.getName());
+		txtEmail.setText(entity.getEmail());
+		Locale.setDefault(Locale.US);
+		txtBaseSalary.setText(String.format("%.2f", entity.getBaseSalary()));
+		if (entity.getBirthDate() != null) {
+				// Esse formato permite que o programa capture a data da maquina do usuario
+				dpBirthDate.setValue(LocalDate.ofInstant(entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
+		}
 	}
-	
-	//dando um set na labelErrorName caso exista um erro
+
+	// dando um set na labelErrorName caso exista um erro
 	private void setErrorMessages(Map<String, String> errors) {
 		Set<String> fields = errors.keySet();
-		
-		if(fields.contains("name")) {
+
+		if (fields.contains("name")) {
 			labelErrorName.setText(errors.get("name"));
 		}
 	}
