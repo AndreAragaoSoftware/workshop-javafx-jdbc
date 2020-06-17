@@ -1,6 +1,7 @@
 package gui;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -44,6 +45,15 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnEDIT;
+	
+	@FXML
+	private TableColumn<Seller, String> tableColumnEmail;
+	
+	@FXML
+	private TableColumn<Seller, Date> tableColumnBirthDate;
+	
+	@FXML
+	private TableColumn<Seller, Double> tableColumnBaseSalary;
 
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnREMOVE;
@@ -71,8 +81,16 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	private void initializeNodes() {
 		// padrão para iniciar o comportamento das colunas
+		// O nome entre parentese tem que esta igual ao atributo do pacote model.entities
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
+		tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+		tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+		//metodo criado na pasta Utils para formata data
+		Utils.formatTableColumnDate(tableColumnBirthDate, "dd/MM/yyyy");
+		tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+		//metodo criado na pasta Utils para formata numeros double/ o 2 significa as casas decimais
+		Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
 
 		// macete para que a tableView acompanhe a janela
 		Stage stage = (Stage) Main.getMainScene().getWindow();
