@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -141,7 +143,34 @@ public class SellerFormController implements Initializable {
 			exception.addError("name", "Fiel can't be empty");
 		}
 		obj.setName(txtName.getText());
-
+		
+		
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) {
+			// foi add um erro caso o campo estiver vazio
+			exception.addError("email", "Fiel can't be empty");
+		}
+		obj.setEmail(txtEmail.getText());
+		
+		if(dpBirthDate.getValue() == null) {
+			exception.addError("birthDate", "Fiel can't be empty");
+		}
+		else {
+		// pegando o valor q ta no datepiker
+		Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+		obj.setBirthDate(Date.from(instant));
+		}
+		
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+			// foi add um erro caso o campo estiver vazio
+			exception.addError("baseSalary", "Fiel can't be empty");
+		}
+		//foi o usado o metodo try para converte o salario
+		obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));;
+		
+		// relacionando o departamento
+		obj.setDepartment(comboBoxDepartment.getValue());
+		
+		
 		// testando pra ve se existe pelomenos um erro
 		if (exception.getErrors().size() > 0) {
 			throw exception;
@@ -210,10 +239,32 @@ public class SellerFormController implements Initializable {
 	// dando um set na labelErrorName caso exista um erro
 	private void setErrorMessages(Map<String, String> errors) {
 		Set<String> fields = errors.keySet();
-
-		if (fields.contains("name")) {
-			labelErrorName.setText(errors.get("name"));
+		
+		// testadando caso no campo name tiver vazio vai gerar um erro na label 
+		// caso nao a label fica vazia
+		labelErrorName.setText((fields.contains("name") ? errors.get("name") : ""));
+		
+		//pode ser feito dessa forma tambem
+		if (fields.contains("email")) {
+			labelErrorEmail.setText(errors.get("email"));
 		}
+		else {
+			labelErrorEmail.setText("");
+		}
+		
+		if (fields.contains("baseSalary")) {
+			labelErrorBaseSalary.setText(errors.get("baseSalary"));
+		}
+		else {
+			labelErrorBaseSalary.setText("");
+		}
+		if (fields.contains("birthDate")) {
+			labelErrorBirthDate.setText(errors.get("birthDate"));
+		}
+		else {
+			labelErrorBirthDate.setText("");
+		}
+		
 	}
 
 	private void initializeComboBoxDepartment() {
